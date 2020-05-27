@@ -8,6 +8,11 @@ include MEM as BWA_MEM from './NextflowModules/BWA/0.7.17/MEM.nf' params(genome:
 include ViewSort as Sambamba_ViewSort from './NextflowModules/Sambamba/0.7.0/ViewSort.nf'
 include MarkdupMerge as Sambamba_MarkdupMerge from './NextflowModules/Sambamba/0.7.0/Markdup.nf'
 
+// GATK BaseRecalibrator
+include BaseRecalibrator as GATK_BaseRecalibrator from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/BaseRecalibrator.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_bqsr_options")
+include ViewUnmapped as Sambamba_ViewUnmapped from './NextflowModules/Sambamba/0.7.0/ViewUnmapped.nf'
+include Merge as Sambamba_Merge from './NextflowModules/Sambamba/0.7.0/Merge.nf'
+
 // Fingerprint modules
 include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
 
@@ -34,6 +39,9 @@ workflow {
     )
 
     // GATK BaseRecalibrator
+    GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
+    Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
+    Sambamba_Merge(GATK_IndelRealigner.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
     // GATK HaplotypeCaller (GVCF)
     // GATK VariantFiltration
