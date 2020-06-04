@@ -30,7 +30,7 @@ sbatch <<EOT
 module load Java/1.8.0_60
 
 /hpc/diaggen/software/tools/nextflow run $workflow_path/WGS.nf \
--c $workflow_path/WES.config \
+-c $workflow_path/WGS.config \
 --fastq_path $input \
 --outdir $output \
 --email $email \
