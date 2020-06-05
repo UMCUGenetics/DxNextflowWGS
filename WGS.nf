@@ -14,7 +14,7 @@ include ViewUnmapped as Sambamba_ViewUnmapped from './NextflowModules/Sambamba/0
 include Merge as Sambamba_Merge from './NextflowModules/Sambamba/0.7.0/Merge.nf'
 
 // GATK HaplotypeCaller
-include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'1000', optional: '--BREAK_BANDS_AT_MULTIPLES_OF 1000000')
+include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'1000', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
 include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_hc_options")
 include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CombineVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--assumeSorted")
 include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome")
@@ -50,7 +50,7 @@ workflow {
     Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
     Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
-    // GATK HaplotypeCaller (GVCF)
+    // GATK HaplotypeCaller (GVCF) -> TODO: Add GVCFGQBands
     PICARD_IntervalListTools(Channel.fromPath("$params.gatk_hc_interval_list"))
     GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
     GATK_CatVariantsGVCF(GATK_HaplotypeCallerGVCF.out.groupTuple())
