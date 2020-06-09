@@ -16,8 +16,8 @@ include Merge as Sambamba_Merge from './NextflowModules/Sambamba/0.7.0/Merge.nf'
 // GATK HaplotypeCaller
 include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'1000', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
 include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_hc_options")
-include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--assumeSorted")
-include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome")
+include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "")
+include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "")
 
 // Fingerprint modules
 include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
