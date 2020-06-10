@@ -27,7 +27,7 @@ include VariantFiltrationSnpIndel as GATK_VariantFiltration from './NextflowModu
 include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
 
 // CNV modules
-include Freec from './NextflowModules/Control-FREEC/11.6/Control-FREEC.nf' params(config: "$baseDir/assets/control-freec.config")
+include Freec from './NextflowModules/ControlFREEC/11.6/ControlFREEC.nf' params(config: "$baseDir/assets/control-freec.config")
 
 
 // QC Modules
