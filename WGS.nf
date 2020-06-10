@@ -61,8 +61,8 @@ workflow {
         sample_id, gvcf_file, gvcf_idx_file, interval_file -> 
         def interval = interval_file.toRealPath().toString().split("/")[-1]
         [sample_id, gvcf_file, gvcf_idx_file, interval_file, interval]
-    }.groupTuple(by: 3).map{
-        sample_id, gvcf_files, gvcf_idx_files, interval_file, interval -> [analysis_id, gvcf_file, gvcf_idx_file, interval_file[0]]
+    }.groupTuple(by: 4).map{
+        sample_id, gvcf_files, gvcf_idx_files, interval_file, interval -> [analysis_id, gvcf_files, gvcf_idx_files, interval_file[0]]
     })
     GATK_CombineVariants(GATK_GenotypeGVCFs.out.groupTuple())
     // Create singlessample g.vcf
