@@ -18,6 +18,10 @@ include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Pi
 include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_hc_options")
 include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "")
 include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_ggvcf_options")
+include CombineVariants as GATK_CombineVariants from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CombineVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--assumeIdenticalSamples")
+include VariantFiltrationSnpIndel as GATK_VariantFiltration from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/VariantFiltration.nf' params(
+    gatk_path: "$params.gatk_path", genome:"$params.genome", snp_filter: "$params.gatk_snp_filter", snp_cluster: "$params.gatk_snp_cluster", indel_filter: "$params.gatk_indel_filter"
+)
 
 // Fingerprint modules
 include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
@@ -52,10 +56,14 @@ workflow {
     // GATK HaplotypeCaller (GVCF)
     PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
     GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
+    // Create multisample vcf
+    GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file, interval_file -> [analysis_id, gvcf_file, gvcf_idx_file, interval_file]}.groupTuple(by: 3))
+    GATK_CombineVariants(GATK_GenotypeGVCFs.out.groupTuple())
+    // Create singlessample g.vcf
     GATK_CatVariantsGVCF(GATK_HaplotypeCallerGVCF.out.groupTuple())
-    GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file -> [analysis_id, gvcf_file, gvcf_idx_file]}.groupTuple())
-    
+
     // GATK VariantFiltration
+    GATK_VariantFiltration(GATK_CombineVariants.out)
 
     // GATK UnifiedGenotyper (fingerprint)
     GATK_UnifiedGenotyper(Sambamba_Merge.out)
