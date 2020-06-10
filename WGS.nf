@@ -57,10 +57,16 @@ workflow {
     PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
     GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
     // Create multisample vcf
-    GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file, interval_file -> [analysis_id, gvcf_file, gvcf_idx_file, interval_file]}.groupTuple(by: 3))
+    GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{
+        sample_id, gvcf_file, gvcf_idx_file, interval_file -> 
+        def interval = interval_file.toRealPath().toString().split("/")[-1]
+        [sample_id, gvcf_file, gvcf_idx_file, interval_file, interval]
+    }.groupTuple(by: 3).map{
+        sample_id, gvcf_files, gvcf_idx_files, interval_file, interval -> [analysis_id, gvcf_file, gvcf_idx_file, interval_file[0]]
+    })
     GATK_CombineVariants(GATK_GenotypeGVCFs.out.groupTuple())
     // Create singlessample g.vcf
-    GATK_CatVariantsGVCF(GATK_HaplotypeCallerGVCF.out.groupTuple())
+    GATK_CatVariantsGVCF(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file, interval_file -> [sample_id, gvcf_file, gvcf_idx_file]}.groupTuple())
 
     // GATK VariantFiltration
     GATK_VariantFiltration(GATK_CombineVariants.out)
