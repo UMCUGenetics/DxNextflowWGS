@@ -14,7 +14,7 @@ include ViewUnmapped as Sambamba_ViewUnmapped from './NextflowModules/Sambamba/0
 include Merge as Sambamba_Merge from './NextflowModules/Sambamba/0.7.0/Merge.nf'
 
 // GATK HaplotypeCaller
-include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'250', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
+include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'500', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
 include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_hc_options")
 include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "")
 include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_ggvcf_options")
@@ -27,8 +27,9 @@ include VariantFiltrationSnpIndel as GATK_VariantFiltration from './NextflowModu
 include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
 
 // CNV modules
-include Freec from './NextflowModules/ControlFREEC/11.6/ControlFREEC.nf' params(config: "$baseDir/assets/control-freec.config")
-
+include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(config: "$baseDir/assets/control-freec.config")
+include Freec as Freec_AssessSignificance from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf.nf'
+include Freec as Freec_MakeGraph from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
 
 // QC Modules
 include FastQC from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional:'')
@@ -82,9 +83,10 @@ workflow {
     // ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
 
     // COPY_NUMBER
-        // CNV_QDNASEQ
-        // CNV_FREEC
     Freec(Sambamba_Merge.out)
+    Freec_AssessSignificance(Freec.cnv)
+    Freec_MakeGraph(Freec.cnv)
+    QDNAseq(Sambamba_Merge.out)
 
     // BAF
 
@@ -132,6 +134,22 @@ process ExonCov {
         """
         source ${params.exoncov_path}/venv/bin/activate
         python ${params.exoncov_path}/ExonCov.py import_bam --threads ${task.cpus} --overwrite --exon_bed ${params.dxtracks_path}/${params.exoncov_bed} ${analysis_id} ${bam_file}
+        """
+}
+
+process QDNAseq {
+    // Custom process to run QDNAseq
+    tag {"QDNAseq ${sample_id}"}
+    label 'QDNAseq'
+    container = '/hpc/diaggen/software/singularity_cache/QDNAseq_v1.9.2-HMF.1.sif'
+    shell = ['/bin/bash', '-euo', 'pipefail']
+
+    input:
+        tuple(sample_id, path(bam_file), path(bai_file))
+    
+    script:
+        """
+        r ${baseDir}/assets/run_QDNAseq.R -s ${sample_id} -b ${bam_file}
         """
 }
 
