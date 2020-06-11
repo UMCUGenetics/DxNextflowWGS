@@ -149,7 +149,7 @@ process QDNAseq {
     
     script:
         """
-        r ${baseDir}/assets/run_QDNAseq.R -s ${sample_id} -b ${bam_file}
+        Rscript ${baseDir}/assets/run_QDNAseq.R -s ${sample_id} -b ${bam_file}
         """
 }
 
