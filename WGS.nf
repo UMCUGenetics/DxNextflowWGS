@@ -28,8 +28,8 @@ include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3
 
 // CNV modules
 include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(config: "$baseDir/assets/control-freec.config")
-include Freec as Freec_AssessSignificance from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf.nf'
-include Freec as Freec_MakeGraph from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
+include AssessSignificance as Freec_AssessSignificance from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf'
+include MakeGraph as Freec_MakeGraph from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
 
 // QC Modules
 include FastQC from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional:'')
@@ -84,8 +84,8 @@ workflow {
 
     // COPY_NUMBER
     Freec(Sambamba_Merge.out)
-    Freec_AssessSignificance(Freec.cnv)
-    Freec_MakeGraph(Freec.cnv)
+    Freec_AssessSignificance(Freec.out.cnv)
+    Freec_MakeGraph(Freec.out.cnv)
     QDNAseq(Sambamba_Merge.out)
 
     // BAF
