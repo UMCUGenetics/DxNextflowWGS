@@ -4,36 +4,36 @@ nextflow.preview.dsl=2
 include extractFastqPairFromDir from './NextflowModules/Utils/fastq.nf'
 
 // Mapping modules
-include MEM as BWA_MEM from './NextflowModules/BWA/0.7.17/MEM.nf' params(genome:"$params.genome", optional: '-c 100 -M')
+include MEM as BWA_MEM from './NextflowModules/BWA/0.7.17/MEM.nf' params(genome: "$params.genome", optional: '-c 100 -M')
 include ViewSort as Sambamba_ViewSort from './NextflowModules/Sambamba/0.7.0/ViewSort.nf'
 include MarkdupMerge as Sambamba_MarkdupMerge from './NextflowModules/Sambamba/0.7.0/Markdup.nf'
 
 // GATK BaseRecalibrator
-include BaseRecalibrator as GATK_BaseRecalibrator from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/BaseRecalibrator.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_bqsr_options")
+include BaseRecalibrator as GATK_BaseRecalibrator from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/BaseRecalibrator.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_bqsr_options")
 include ViewUnmapped as Sambamba_ViewUnmapped from './NextflowModules/Sambamba/0.7.0/ViewUnmapped.nf'
 include Merge as Sambamba_Merge from './NextflowModules/Sambamba/0.7.0/Merge.nf'
 
 // GATK HaplotypeCaller
 include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'500', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
-include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_hc_options")
-include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "")
-include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "$params.gatk_ggvcf_options")
-include CombineVariants as GATK_CombineVariants from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CombineVariants.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--assumeIdenticalSamples")
+include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_hc_options")
+include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "")
+include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_ggvcf_options")
+include CombineVariants as GATK_CombineVariants from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CombineVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--assumeIdenticalSamples")
 include VariantFiltrationSnpIndel as GATK_VariantFiltration from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/VariantFiltration.nf' params(
-    gatk_path: "$params.gatk_path", genome:"$params.genome", snp_filter: "$params.gatk_snp_filter", snp_cluster: "$params.gatk_snp_cluster", indel_filter: "$params.gatk_indel_filter"
+    gatk_path: "$params.gatk_path", genome: "$params.genome", snp_filter: "$params.gatk_snp_filter", snp_cluster: "$params.gatk_snp_cluster", indel_filter: "$params.gatk_indel_filter"
 )
 
 // Fingerprint modules
-include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome:"$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
+include UnifiedGenotyper as GATK_UnifiedGenotyper from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
 
 // CNV modules
-include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(config: "$baseDir/assets/control-freec.config")
+include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(chr_len_file: "$params.freec_chr_len_file", chr_files: "$params.freec_chr_files", gem_mappability_file: "$params.freec_gem_mappability_file", ploidy: "$params.freec_ploidy", window: "$params.freec_window")
 include Freec as Freec_AssessSignificance from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf.nf'
 include Freec as Freec_MakeGraph from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
 
 // QC Modules
-include FastQC from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional:'')
-include MultiQC from './NextflowModules/MultiQC/1.8/MultiQC.nf' params(optional:"--config $baseDir/assets/multiqc_config.yaml")
+include FastQC from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional: "")
+include MultiQC from './NextflowModules/MultiQC/1.8/MultiQC.nf' params(optional: "--config $baseDir/assets/multiqc_config.yaml")
 
 def fastq_files = extractFastqPairFromDir(params.fastq_path)
 def analysis_id = params.outdir.split('/')[-1]
