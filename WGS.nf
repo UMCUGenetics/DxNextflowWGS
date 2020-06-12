@@ -166,6 +166,32 @@ process QDNAseq {
         """
 }
 
+process BAF {
+    // Custom process to run BAF analysis
+    tag {"BAF ${sample_id}"}
+    label 'BAF'
+    container = '/hpc/diaggen/software/singularity_cache/baf_nextflow.sif'
+    shell = ['/bin/bash', '-euo', 'pipefail']
+
+    input:
+        tuple(sample_id, path(bam_file), path(bai_file))
+    
+    output:
+        tuple(sample_id, path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
+    
+    script:
+        """
+        bio-vcf --num-threads ${task.cpus} -i \
+        --sfilter '!s.empty? and s.dp>=20' \
+        --eval '[r.chrom,r.pos,r.ref+">"+r.alt[0]]' \
+        --seval 'tot=s.ad.reduce(:+) ; ((tot-s.ad[0].to_f)/tot).round(2)' \
+        > ${sample_id}_BAF.txt
+
+        Rscript ${baseDir}/assets/makeBAFplot.R . ${sample_id}_BAF.txt
+
+        """
+}
+
 process GetStatsFromFlagstat {
     // Custom process to run get_stats_from_flagstat.pl
     tag {"GetStatsFromFlagstat"}
