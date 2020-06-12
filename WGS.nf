@@ -188,7 +188,7 @@ process BAF {
         --seval 'tot=s.ad.reduce(:+) ; ((tot-s.ad[0].to_f)/tot).round(2)' \
         > ${sample_id}_BAF.txt
 
-        Rscript ${baseDir}/assets/makeBAFplot.R . ${sample_id}_BAF.txt
+        Rscript ${baseDir}/assets/makeBAFplot.R ./ ${sample_id}_BAF.txt
 
         """
 }
