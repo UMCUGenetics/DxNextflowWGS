@@ -9,12 +9,18 @@ top_modules:
 
 picard_config:
     general_stats_target_coverage:
-        - 2
+        - 5
         - 10
+        - 15
         - 20
+        - 25
         - 30
         - 40
         - 50
+        - 60
+        - 70
+        - 80
+        - 90
         - 100
 
 table_columns_visible:
@@ -24,25 +30,3 @@ table_columns_visible:
         avg_sequence_length: False
         percent_fails: False
         total_sequences: False
-    Picard:
-        PCT_TARGET_BASES_2X: False
-        PCT_TARGET_BASES_10X: True
-        PCT_TARGET_BASES_20X: True
-        PCT_TARGET_BASES_30X: True
-        PCT_TARGET_BASES_40X: False
-        PCT_TARGET_BASES_50X: False
-        PCT_TARGET_BASES_100X: False
-        PCT_PF_READS_ALIGNED: False
-        FOLD_ENRICHMENT: False
-        summed_median: True
-        summed_mean: False
-        PERCENT_DUPLICATION: True
-
-table_cond_formatting_rules:
-    mqc-generalstats-picard-PCT_TARGET_BASES_20X:
-        pass:
-            - gt: 96
-        warn:
-            - lt: 96
-        fail:
-            - lt: 95
