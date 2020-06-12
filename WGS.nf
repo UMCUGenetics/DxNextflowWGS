@@ -93,6 +93,7 @@ workflow {
 
     // BAF
     GATK_UnifiedGenotyper_BAF(Sambamba_Merge.out)
+    BAF(GATK_UnifiedGenotyper_BAF.out)
 
     // QC
     FastQC(fastq_files)
@@ -174,14 +175,14 @@ process BAF {
     shell = ['/bin/bash', '-euo', 'pipefail']
 
     input:
-        tuple(sample_id, path(bam_file), path(bai_file))
+        tuple(sample_id, path(vcf_file))
     
     output:
         tuple(sample_id, path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
     
     script:
         """
-        bio-vcf --num-threads ${task.cpus} -i \
+        cat ${vcf_file} | bio-vcf --num-threads ${task.cpus} -i \
         --sfilter '!s.empty? and s.dp>=20' \
         --eval '[r.chrom,r.pos,r.ref+">"+r.alt[0]]' \
         --seval 'tot=s.ad.reduce(:+) ; ((tot-s.ad[0].to_f)/tot).round(2)' \
