@@ -147,9 +147,18 @@ process QDNAseq {
     input:
         tuple(sample_id, path(bam_file), path(bai_file))
     
+    output:
+        tuple(sample_id, path("${sample_id}.vcf"), emit: vcf)
+        tuple(sample_id, path("${sample_id}.*.igv"), emit: igv)
+        tuple(sample_id, path("${sample_id}.readCountsFiltered.rds"), emit: rds)
+    
     script:
         """
         Rscript ${baseDir}/assets/run_QDNAseq.R -s ${sample_id} -b ${bam_file}
+        mv readCountsFiltered.rds ${sample_id}.readCountsFiltered.rds
+        mv copynumber.igv ${sample_id}.copynumber.igv
+        mv segments.igv ${sample_id}.segments.igv
+        mv calls.igv ${sample_id}.calls.igv
         """
 }
 

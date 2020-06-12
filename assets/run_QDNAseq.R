@@ -7,7 +7,7 @@ library(QDNAseq)
 # Command line arguments
 GetoptLong(c(
 	"bams|b=s@", "Bam files",
-	"sampleNames|s=s@", "Sample names, same order as bams",
+	"sampleNames|s=s@", "Sample names, same order as bams"
 ))
 
 ## Load callable loci bins
