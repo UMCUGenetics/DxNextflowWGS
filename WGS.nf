@@ -105,11 +105,11 @@ workflow {
     PICARD_CollectWgsMetrics(Sambamba_Merge.out)
     
     MultiQC(analysis_id, Channel.empty().mix(
-        FastQC.out.collect(),
-        PICARD_CollectMultipleMetrics.out.collect(),
-        PICARD_EstimateLibraryComplexity.out.collect(),
-        PICARD_CollectWgsMetrics.out.collect()
-    ))
+        FastQC.out,
+        PICARD_CollectMultipleMetrics.out,
+        PICARD_EstimateLibraryComplexity.out,
+        PICARD_CollectWgsMetrics.out
+    ).collect())
 
     // Repository versions
     VersionLog()
