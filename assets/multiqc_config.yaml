@@ -30,3 +30,25 @@ table_columns_visible:
         avg_sequence_length: False
         percent_fails: False
         total_sequences: False
+    Picard:
+        PCT_PF_READS_ALIGNED: False
+        summed_median: True
+        summed_mean: False
+        PERCENT_DUPLICATION: True
+        MEDIAN_COVERAGE: True
+        MEAN_COVERAGE: False
+        SD_COVERAGE: False
+        PCT_5X: True
+        PCT_10X: True
+        PCT_15X: False
+        PCT_20X: True
+        PCT_25X: False
+        PCT_30X: True
+        PCT_40X: False
+        PCT_50X: False
+        PCT_60X: False
+        PCT_70X: False
+        PCT_80X: False
+        PCT_90X: False
+        PCT_100X: False        
+        
