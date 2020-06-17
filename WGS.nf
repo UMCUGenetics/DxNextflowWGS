@@ -4,7 +4,7 @@ nextflow.preview.dsl=2
 include extractFastqPairFromDir from './NextflowModules/Utils/fastq.nf'
 
 // Mapping modules
-include BWAMapping from './NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(genome: "$params.genome_fasta", optional: '-c 100 -M')
+include BWAMapping from './NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(genome_fasta: "$params.genome", optional: '-c 100 -M')
 include MarkdupMerge as Sambamba_MarkdupMerge from './NextflowModules/Sambamba/0.7.0/Markdup.nf'
 
 // GATK BaseRecalibrator
