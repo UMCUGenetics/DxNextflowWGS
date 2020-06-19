@@ -36,7 +36,7 @@ table_columns_visible:
         summed_mean: False
         PERCENT_DUPLICATION: True
         MEDIAN_COVERAGE: True
-        MEAN_COVERAGE: False
+        MEAN_COVERAGE: True
         SD_COVERAGE: False
         PCT_5X: True
         PCT_10X: True
@@ -44,7 +44,7 @@ table_columns_visible:
         PCT_20X: True
         PCT_25X: False
         PCT_30X: True
-        PCT_40X: False
+        PCT_40X: True
         PCT_50X: False
         PCT_60X: False
         PCT_70X: False
