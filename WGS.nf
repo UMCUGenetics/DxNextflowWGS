@@ -26,7 +26,7 @@ include VariantFiltrationSnpIndel as GATK_VariantFiltration from './NextflowModu
 include UnifiedGenotyper as GATK_UnifiedGenotyper_Fingerprint from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
 
 // CNV modules
-include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(chr_len_file: "$params.freec_chr_len_file", chr_files: "$params.freec_chr_files", gem_mappability_file: "$params.freec_gem_mappability_file", ploidy: "$params.freec_ploidy", window: "$params.freec_window")
+include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(chr_len_file: "$params.freec_chr_len_file", chr_files: "$params.freec_chr_files", gem_mappability_file: "$params.freec_gem_mappability_file", ploidy: "$params.freec_ploidy", window: "$params.freec_window", telocentromeric: "$params.freec_telocentromeric")
 include AssessSignificance as Freec_AssessSignificance from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf'
 include MakeGraph as Freec_MakeGraph from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
 
