@@ -84,7 +84,7 @@ workflow {
     GATK_UnifiedGenotyper_Fingerprint(Sambamba_Merge.out)
 
     // ExonCov
-    // ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
+    ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
 
     // COPY_NUMBER
     Freec(Sambamba_Merge.out)
