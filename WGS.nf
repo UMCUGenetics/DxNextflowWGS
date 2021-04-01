@@ -67,7 +67,7 @@ workflow {
     GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
     // Create multisample vcf
     GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{
-        sample_id, gvcf_file, gvcf_idx_file, interval_file -> 
+        sample_id, gvcf_file, gvcf_idx_file, interval_file ->
         def interval = interval_file.toRealPath().toString().split("/")[-1]
         [sample_id, gvcf_file, gvcf_idx_file, interval_file, interval]
     }.groupTuple(by: 4).map{
@@ -101,7 +101,7 @@ workflow {
     PICARD_CollectMultipleMetrics(Sambamba_Merge.out)
     PICARD_EstimateLibraryComplexity(Sambamba_Merge.out)
     PICARD_CollectWgsMetrics(Sambamba_Merge.out)
-    
+
     MultiQC(analysis_id, Channel.empty().mix(
         FastQC.out,
         PICARD_CollectMultipleMetrics.out,
@@ -147,7 +147,7 @@ process ExonCov {
     script:
         """
         source ${params.exoncov_path}/venv/bin/activate
-        python ${params.exoncov_path}/ExonCov.py import_bam --threads ${task.cpus} --overwrite --exon_bed ${params.dxtracks_path}/${params.exoncov_bed} ${analysis_id} ${bam_file}
+        python ${params.exoncov_path}/ExonCov.py import_bam --threads ${task.cpus} --overwrite --exon_bed ${params.dxtracks_path}/${params.exoncov_bed} ${analysis_id} WGS ${bam_file}
         """
 }
 
@@ -160,12 +160,12 @@ process QDNAseq {
 
     input:
         tuple(sample_id, path(bam_file), path(bai_file))
-    
+
     output:
         tuple(sample_id, path("${sample_id}.vcf"), emit: vcf)
         tuple(sample_id, path("${sample_id}.*.igv"), emit: igv)
         tuple(sample_id, path("${sample_id}.readCountsFiltered.rds"), emit: rds)
-    
+
     script:
         """
         Rscript ${baseDir}/assets/run_QDNAseq.R -s ${sample_id} -b ${bam_file}
@@ -185,10 +185,10 @@ process BAF {
 
     input:
         tuple(sample_id, path(vcf_file))
-    
+
     output:
         tuple(sample_id, path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
-    
+
     script:
         """
         cat ${vcf_file} | bio-vcf --num-threads ${task.cpus} -i \
