@@ -1,6 +1,22 @@
 # DxNextflowWGS
 Genome Diagnostics Nextflow WGS workflow
 
+## Get Nextflow Modules
+```bash
+git submodule update --init --recursive
+```
+
+## Install Nextflow
+```bash
+mkdir tools && cd tools
+curl -s https://get.nextflow.io | bash
+```
+
+## Running WGS workflow
+```bash
+nextflow run WGS.nf -c WGS.config --fastq_path <fastq_dir_path> --outdir <output_dir_path> --email <email> [-profile slurm|mac]
+```
+
 ## QDNAseq GUIX container
 ```bash
 guixr pack -f squashfs -RR -S /bin=bin r r-qdnaseq-hmf r-getoptlong perl bash glibc-utf8-locales tzdata coreutils procps grep sed bootstrap-binaries
