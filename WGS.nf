@@ -1,7 +1,9 @@
 #!/usr/bin/env nextflow
 nextflow.preview.dsl=2
 
+// Utils modules
 include extractFastqPairFromDir from './NextflowModules/Utils/fastq.nf'
+include ExportParams as Workflow_ExportParams from './NextflowModules/Utils/workflow.nf'
 
 // Mapping modules
 include BWAMapping from './NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(genome_fasta: "$params.genome", optional: '-c 100 -M')
@@ -109,8 +111,9 @@ workflow {
         PICARD_CollectWgsMetrics.out
     ).collect())
 
-    // Repository versions
+    // Create log files: Repository versions and Workflow params
     VersionLog()
+    Workflow_ExportParams()
 }
 
 // Workflow completion notification
@@ -225,6 +228,7 @@ process VersionLog {
     tag {"VersionLog ${analysis_id}"}
     label 'VersionLog'
     shell = ['/bin/bash', '-eo', 'pipefail']
+    cache = false  //Disable cache to force a new version log when restarting the workflow.
 
     output:
         path('repository_version.log')
