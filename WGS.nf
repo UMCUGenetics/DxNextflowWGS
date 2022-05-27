@@ -51,69 +51,69 @@ def chromosomes = Channel.fromPath(params.genome.replace('fasta', 'dict'))
     .map{type, chr, chr_len, md5, file -> [chr.minus('SN:')]}
 
 workflow {
-    // Mapping
-    BWAMapping(fastq_files)
-    Sambamba_MarkdupMerge(
-        BWAMapping.out.map{
-            sample_id, rg_id, bam_file, bai_file -> [sample_id, bam_file]
-        }.groupTuple()
-    )
+    // // Mapping
+    // BWAMapping(fastq_files)
+    // Sambamba_MarkdupMerge(
+    //     BWAMapping.out.map{
+    //         sample_id, rg_id, bam_file, bai_file -> [sample_id, bam_file]
+    //     }.groupTuple()
+    // )
 
-    // GATK BaseRecalibrator
-    GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
-    Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
-    Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
+    // // GATK BaseRecalibrator
+    // GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
+    // Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
+    // Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
-    // GATK HaplotypeCaller (GVCF)
-    PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
-    GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
-    // Create multisample vcf
-    GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{
-        sample_id, gvcf_file, gvcf_idx_file, interval_file ->
-        def interval = interval_file.toRealPath().toString().split("/")[-1]
-        [sample_id, gvcf_file, gvcf_idx_file, interval_file, interval]
-    }.groupTuple(by: 4).map{
-        sample_id, gvcf_files, gvcf_idx_files, interval_file, interval -> [analysis_id, gvcf_files, gvcf_idx_files, interval_file[0]]
-    })
-    GATK_CombineVariants(GATK_GenotypeGVCFs.out.groupTuple())
-    // Create singlessample g.vcf
-    GATK_CatVariantsGVCF(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file, interval_file -> [sample_id, gvcf_file, gvcf_idx_file]}.groupTuple())
+    // // GATK HaplotypeCaller (GVCF)
+    // PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
+    // GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
+    // // Create multisample vcf
+    // GATK_GenotypeGVCFs(GATK_HaplotypeCallerGVCF.out.map{
+    //     sample_id, gvcf_file, gvcf_idx_file, interval_file ->
+    //     def interval = interval_file.toRealPath().toString().split("/")[-1]
+    //     [sample_id, gvcf_file, gvcf_idx_file, interval_file, interval]
+    // }.groupTuple(by: 4).map{
+    //     sample_id, gvcf_files, gvcf_idx_files, interval_file, interval -> [analysis_id, gvcf_files, gvcf_idx_files, interval_file[0]]
+    // })
+    // GATK_CombineVariants(GATK_GenotypeGVCFs.out.groupTuple())
+    // // Create singlessample g.vcf
+    // GATK_CatVariantsGVCF(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file, interval_file -> [sample_id, gvcf_file, gvcf_idx_file]}.groupTuple())
 
-    // GATK VariantFiltration
-    GATK_VariantFiltration(GATK_CombineVariants.out)
+    // // GATK VariantFiltration
+    // GATK_VariantFiltration(GATK_CombineVariants.out)
 
-    // GATK UnifiedGenotyper (fingerprint)
-    GATK_UnifiedGenotyper_Fingerprint(Sambamba_Merge.out)
+    // // GATK UnifiedGenotyper (fingerprint)
+    // GATK_UnifiedGenotyper_Fingerprint(Sambamba_Merge.out)
 
-    // ExonCov
-    ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
+    // // ExonCov
+    // ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
 
-    // COPY_NUMBER
-    Freec(Sambamba_Merge.out)
-    Freec_AssessSignificance(Freec.out.cnv)
-    Freec_MakeGraph(Freec.out.cnv)
-    QDNAseq(Sambamba_Merge.out)
+    // // COPY_NUMBER
+    // Freec(Sambamba_Merge.out)
+    // Freec_AssessSignificance(Freec.out.cnv)
+    // Freec_MakeGraph(Freec.out.cnv)
+    // QDNAseq(Sambamba_Merge.out)
 
-    // BAF
-    GATK_UnifiedGenotyper_BAF(Sambamba_Merge.out)
-    BAF(GATK_UnifiedGenotyper_BAF.out)
+    // // BAF
+    // GATK_UnifiedGenotyper_BAF(Sambamba_Merge.out)
+    // BAF(GATK_UnifiedGenotyper_BAF.out)
 
     // QC
     FastQC(fastq_files)
-    PICARD_CollectMultipleMetrics(Sambamba_Merge.out)
-    PICARD_EstimateLibraryComplexity(Sambamba_Merge.out)
-    PICARD_CollectWgsMetrics(Sambamba_Merge.out)
+    // PICARD_CollectMultipleMetrics(Sambamba_Merge.out)
+    // PICARD_EstimateLibraryComplexity(Sambamba_Merge.out)
+    // PICARD_CollectWgsMetrics(Sambamba_Merge.out)
 
-    MultiQC(analysis_id, Channel.empty().mix(
-        FastQC.out,
-        PICARD_CollectMultipleMetrics.out,
-        PICARD_EstimateLibraryComplexity.out,
-        PICARD_CollectWgsMetrics.out
-    ).collect())
+    // MultiQC(analysis_id, Channel.empty().mix(
+    //     FastQC.out,
+    //     PICARD_CollectMultipleMetrics.out,
+    //     PICARD_EstimateLibraryComplexity.out,
+    //     PICARD_CollectWgsMetrics.out
+    // ).collect())
 
-    // Create log files: Repository versions and Workflow params
-    VersionLog()
-    Workflow_ExportParams()
+    // // Create log files: Repository versions and Workflow params
+    // VersionLog()
+    // Workflow_ExportParams()
 }
 
 // Workflow completion notification
@@ -130,7 +130,8 @@ workflow.onComplete {
     // Send email
     if (workflow.success) {
         def subject = "WGS Workflow Successful: ${analysis_id}"
-        sendMail(to: params.email.trim(), subject: subject, body: email_html, attach: "${params.outdir}/QC/${analysis_id}_multiqc_report.html")
+        sendMail(to: params.email.trim(), subject: subject, body: email_html) // TEMP!!
+        //sendMail(to: params.email.trim(), subject: subject, body: email_html, attach: "${params.outdir}/QC/${analysis_id}_multiqc_report.html")
     } else {
         def subject = "WGS Workflow Failed: ${analysis_id}"
         sendMail(to: params.email.trim(), subject: subject, body: email_html)
