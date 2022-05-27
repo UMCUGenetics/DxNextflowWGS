@@ -52,15 +52,15 @@ def chromosomes = Channel.fromPath(params.genome.replace('fasta', 'dict'))
 
 workflow {
     // // Mapping
-    // BWAMapping(fastq_files)
-    // Sambamba_MarkdupMerge(
-    //     BWAMapping.out.map{
-    //         sample_id, rg_id, bam_file, bai_file -> [sample_id, bam_file]
-    //     }.groupTuple()
-    // )
+    BWAMapping(fastq_files)
+    Sambamba_MarkdupMerge(
+        BWAMapping.out.map{
+            sample_id, rg_id, bam_file, bai_file -> [sample_id, bam_file]
+        }.groupTuple()
+    )
 
     // // GATK BaseRecalibrator
-    // GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
+    GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
     // Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
     // Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
