@@ -62,7 +62,7 @@ workflow {
     // // GATK BaseRecalibrator
     GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
     Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
-    // Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
+    Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
     // // GATK HaplotypeCaller (GVCF)
     // PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
