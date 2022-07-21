@@ -51,7 +51,7 @@ def chromosomes = Channel.fromPath(params.genome.replace('fasta', 'dict'))
     .map{type, chr, chr_len, md5, file -> [chr.minus('SN:')]}
 
 workflow {
-    // // Mapping
+    // Mapping
     BWAMapping(fastq_files)
     Sambamba_MarkdupMerge(
         BWAMapping.out.map{
@@ -59,12 +59,12 @@ workflow {
         }.groupTuple()
     )
 
-    // // GATK BaseRecalibrator
+    // GATK BaseRecalibrator
     GATK_BaseRecalibrator(Sambamba_MarkdupMerge.out.combine(chromosomes))
     Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out)
     Sambamba_Merge(GATK_BaseRecalibrator.out.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
-    // // GATK HaplotypeCaller (GVCF)
+    // GATK HaplotypeCaller (GVCF)
     PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
     GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
     // Create multisample vcf
