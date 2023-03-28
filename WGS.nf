@@ -51,9 +51,9 @@ def chromosomes = Channel.fromPath(params.genome.replace('fasta', 'dict'))
 
 workflow {
     // Mapping
-    BWAMapping(fastq_files)
+    BWA_MEM(fastq_files)
     Sambamba_MarkdupMerge(
-        BWAMapping.out.map{
+        BWA_MEM.out.map{
             sample_id, rg_id, bam_file, bai_file -> [sample_id, bam_file]
         }.groupTuple()
     )
