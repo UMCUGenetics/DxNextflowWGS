@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-workflow_path='/hpc/diaggen/software/production/DxNextflowWGS'
+workflow_path='/hpc/diaggen/projects/wgs_refactor/DxNextflowWGS'
 
 # Set input and output dirs
 input=`realpath -e $1`
@@ -28,9 +28,9 @@ sbatch <<EOT
 #SBATCH --export=NONE
 #SBATCH --account=diaggen
 
-module load Java/1.8.0_60
+export NXF_JAVA_HOME='/hpc/diaggen/projects/wgs_refactor/tools/jdk-18.0.2.1'
 
-/hpc/diaggen/software/tools/nextflow run $workflow_path/WGS.nf \
+/hpc/diaggen/projects/wgs_refactor/tools/nextflow-22.10.7-all run $workflow_path/WGS.nf \
 -c $workflow_path/WGS.config \
 --fastq_path $input \
 --outdir $output \
@@ -42,14 +42,14 @@ ${optional_params[@]:-""}
 if [ \$? -eq 0 ]; then
     echo "Nextflow done."
 
-    echo "Zip work directory"
-    find work -type f | egrep "\.(command|exitcode)" | zip -@ -q work.zip
+    # echo "Zip work directory"
+    # find work -type f | egrep "\.(command|exitcode)" | zip -@ -q work.zip
 
-    echo "Remove work directory"
-    rm -r work
+    # echo "Remove work directory"
+    # rm -r work
 
-    echo "Creating md5sum"
-    find -type f -not -iname 'md5sum.txt' -exec md5sum {} \; > md5sum.txt
+    # echo "Creating md5sum"
+    # find -type f -not -iname 'md5sum.txt' -exec md5sum {} \; > md5sum.txt
 
     echo "WGS workflow completed successfully."
     rm workflow.running
@@ -57,16 +57,16 @@ if [ \$? -eq 0 ]; then
 
     echo "Change permissions"
     chmod 775 -R $output
-    
+
     exit 0
 else
     echo "Nextflow failed"
     rm workflow.running
     touch workflow.failed
-    
+
     echo "Change permissions"
     chmod 775 -R $output
-    
+
     exit 1
 fi
 EOT
