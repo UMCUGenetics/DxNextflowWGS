@@ -144,7 +144,7 @@ process ExonCov {
     shell = ['/bin/bash', '-eo', 'pipefail']
 
     input:
-        tuple(analysis_id, sample_id, path(bam_file), path(bai_file))
+        tuple(val(analysis_id), sample_id, path(bam_file), path(bai_file))
 
     script:
         """
@@ -161,12 +161,12 @@ process QDNAseq {
     shell = ['/bin/bash', '-euo', 'pipefail']
 
     input:
-        tuple(sample_id, path(bam_file), path(bai_file))
+        tuple(val(sample_id), path(bam_file), path(bai_file))
 
     output:
-        tuple(sample_id, path("${sample_id}.vcf"), emit: vcf)
-        tuple(sample_id, path("${sample_id}.*.igv"), emit: igv)
-        tuple(sample_id, path("${sample_id}.readCountsFiltered.rds"), emit: rds)
+        tuple(val(sample_id), path("${sample_id}.vcf"), emit: vcf)
+        tuple(val(sample_id), path("${sample_id}.*.igv"), emit: igv)
+        tuple(val(sample_id), path("${sample_id}.readCountsFiltered.rds"), emit: rds)
 
     script:
         """
@@ -186,10 +186,10 @@ process BAF {
     shell = ['/bin/bash', '-euo', 'pipefail']
 
     input:
-        tuple(sample_id, path(vcf_file))
+        tuple(val(sample_id), path(vcf_file))
 
     output:
-        tuple(sample_id, path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
+        tuple(val(sample_id), path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
 
     script:
         """
