@@ -6,15 +6,15 @@ include { ExportParams as Workflow_ExportParams } from './NextflowModules/Utils/
 
 // Mapping modules
 include { MEM as BWA_MEM } from './NextflowModules/BWAMEM2/2.2.1/MEM.nf' params(genome_fasta: "$params.genome", optional: "-K 100000000 -Y")  //new best practice settings
-include { MarkdupMerge as Sambamba_MarkdupMerge } from './NextflowModules/Sambamba/0.7.0/Markdup.nf'
+include { MarkdupMerge as Sambamba_MarkdupMerge } from './NextflowModules/Sambamba/1.0.0/Markdup.nf'
 
 // GATK BaseRecalibrator
 include { BaseRecalibrator as GATK_BaseRecalibrator } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/BaseRecalibrator.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional_bqsr: "$params.gatk_bqsr_options", optional_pr: "$params.gatk_bqsr_pr_options")
-include { ViewUnmapped as Sambamba_ViewUnmapped } from './NextflowModules/Sambamba/0.7.0/ViewUnmapped.nf'
-include { Merge as Sambamba_Merge } from './NextflowModules/Sambamba/0.7.0/Merge.nf'
+include { ViewUnmapped as Sambamba_ViewUnmapped } from './NextflowModules/Sambamba/1.0.0/ViewUnmapped.nf'
+include { Merge as Sambamba_Merge } from './NextflowModules/Sambamba/1.0.0/Merge.nf'
 
 // GATK HaplotypeCaller
-include { IntervalListTools as PICARD_IntervalListTools } from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'500', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
+include { IntervalListTools as PICARD_IntervalListTools } from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'500', optional:'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
 include { HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_hc_options")
 include { CatVariantsGVCF as GATK_CatVariantsGVCF } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "")
 include { GenotypeGVCFs as GATK_GenotypeGVCFs } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_ggvcf_options")
