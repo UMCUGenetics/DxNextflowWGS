@@ -33,7 +33,7 @@ include { Mosdepth } from './NextflowModules/Mosdepth/0.3.3/Mosdepth.nf' params(
 include { MultiQC } from './NextflowModules/MultiQC/1.9/MultiQC.nf' params(optional: "--config $baseDir/assets/multiqc_config.yaml")
 
 // CustomModules
-include VersionLog from './CustomModules/Utils/VersionLog.nf'
+include { VersionLog } from './CustomModules/Utils/VersionLog.nf'
 
 def fastq_files = extractFastqPairFromDir(params.fastq_path)
 def analysis_id = params.outdir.split('/')[-1]
