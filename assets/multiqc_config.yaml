@@ -4,11 +4,13 @@ extra_fn_clean_exts:
     - '.LibraryComplexity'
 
 top_modules:
-- 'fastqc'
 - 'picard'
+- 'sambamba'
+- 'mosdepth'
+- 'fastqc'
 
-picard_config:
-    general_stats_target_coverage:
+mosdepth_config:
+    general_stats_coverage:
         - 5
         - 10
         - 15
@@ -17,11 +19,8 @@ picard_config:
         - 30
         - 40
         - 50
-        - 60
-        - 70
-        - 80
-        - 90
-        - 100
+    exclude_contigs:
+        - "MT"
 
 table_columns_visible:
     FastQC:
@@ -30,25 +29,35 @@ table_columns_visible:
         avg_sequence_length: False
         percent_fails: False
         total_sequences: False
+    mosdepth:
+        5_x_pc: True
+        10_x_pc: True
+        15_x_pc: False
+        20_x_pc: True
+        25_x_pc: False
+        30_x_pc: True
+        40_x_pc: True
+        50_x_pc: False
+        mean_coverage: True
+        median_coverage: False
+    Sambamba:
+        duplicate_rate: True
     Picard:
         PCT_PF_READS_ALIGNED: False
         summed_median: True
         summed_mean: False
-        PERCENT_DUPLICATION: True
-        MEDIAN_COVERAGE: True
-        MEAN_COVERAGE: True
-        SD_COVERAGE: False
-        PCT_5X: True
-        PCT_10X: True
-        PCT_15X: False
-        PCT_20X: True
-        PCT_25X: False
-        PCT_30X: True
-        PCT_40X: True
-        PCT_50X: False
-        PCT_60X: False
-        PCT_70X: False
-        PCT_80X: False
-        PCT_90X: False
-        PCT_100X: False        
-        
+
+table_columns_placement:
+    Picard:
+        summed_median: 900
+    Sambamba:
+        duplicate_rate: 910
+    mosdepth:
+        mean_coverage: 920
+        5_x_pc: 921
+        10_x_pc: 922
+        20_x_pc: 923
+        30_x_pc: 924
+        40_x_pc: 925
+
+
