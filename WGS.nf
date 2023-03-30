@@ -30,7 +30,7 @@ include { UnifiedGenotyper as GATK_UnifiedGenotyper_Fingerprint } from './Nextfl
 include { FastQC } from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional: "")
 include { CollectMultipleMetrics as PICARD_CollectMultipleMetrics } from './NextflowModules/Picard/2.22.0/CollectMultipleMetrics.nf' params(genome:"$params.genome", optional: "PROGRAM=null PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics PROGRAM=CollectGcBiasMetrics METRIC_ACCUMULATION_LEVEL=null METRIC_ACCUMULATION_LEVEL=SAMPLE")
 include { Mosdepth } from './NextflowModules/Mosdepth/0.3.3/Mosdepth.nf' params(optional: "-n --fast-mode")
-include { MultiQC } from './NextflowModules/MultiQC/1.9/MultiQC.nf' params(optional: "--config $baseDir/assets/multiqc_config.yaml")
+include { MultiQC } from './NextflowModules/MultiQC/1.14/MultiQC.nf' params(optional: "--config $baseDir/assets/multiqc_config.yaml")
 
 // CustomModules
 include { VersionLog } from './CustomModules/Utils/VersionLog.nf'
