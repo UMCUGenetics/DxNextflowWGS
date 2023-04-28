@@ -1,3 +1,4 @@
+log_filesize_limit: 1000000000
 extra_fn_clean_exts:
     - type: regex
       pattern: '_\w*_S\d+_L\d{3}_R\d_\d{3}'
