@@ -10,7 +10,7 @@ include { MarkdupMerge as Sambamba_MarkdupMerge } from './NextflowModules/Sambam
 
 // GATK BaseRecalibrator
 include { BaseRecalibratorApplyBQSR as GATK_BaseRecalibratorApplyBQSR } from './NextflowModules/GATK/4.3.0.0/BaseRecalibrator.nf' params(genome_fasta: "$params.genome", optional_br: "$params.gatk_bqsr_options")
-include { ViewUnmapped as Sambamba_ViewUnmapped } from './NextflowModules/Sambamba/0.7.0/View.nf'
+include { ViewUnmapped as Sambamba_ViewUnmapped } from './NextflowModules/Sambamba/0.7.0/ViewUnmapped.nf'
 include { Merge as Sambamba_Merge } from './NextflowModules/Sambamba/0.7.0/Merge.nf'
 
 // GATK HaplotypeCaller
