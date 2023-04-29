@@ -15,10 +15,10 @@ include { Merge as Sambamba_Merge } from './NextflowModules/Sambamba/0.7.0/Merge
 
 // GATK HaplotypeCaller
 include { IntervalListTools as PICARD_IntervalListTools } from './NextflowModules/Picard/3.0.0/IntervalListTools.nf' params(scatter_count:'500', optional:'--BREAK_BANDS_AT_MULTIPLES_OF 1000000')
-include { HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF } from './NextflowModules/GATK/4.3.0.0/HaplotypeCaller.nf' params(genome: "$params.genome", optional: "$params.gatk_hc_options")
-include { GenotypeGVCFs as GATK_GenotypeGVCFs } from './NextflowModules/GATK/4.3.0.0/GenotypeGVCFs.nf' params(genome: "$params.genome", optional: "$params.gatk_ggvcf_options")
+include { HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF } from './NextflowModules/GATK/4.3.0.0/HaplotypeCaller.nf' params(genome_fasta: "$params.genome", optional: "$params.gatk_hc_options")
+include { GenotypeGVCFs as GATK_GenotypeGVCFs } from './NextflowModules/GATK/4.3.0.0/GenotypeGVCFs.nf' params(genome_fasta: "$params.genome", optional: "$params.gatk_ggvcf_options")
 include { MergeVcfs as PICARD_MergeVcfs } from './NextflowModules/Picard/3.0.0/MergeVcfs.nf'
-include { CombineGVCFs as GATK_CombineGVCFs } from './NextflowModules/GATK/4.3.0.0/CombineGVCFs.nf' params(genome: "$params.genome", optional: "")
+include { CombineGVCFs as GATK_CombineGVCFs } from './NextflowModules/GATK/4.3.0.0/CombineGVCFs.nf' params(genome_fasta: "$params.genome", optional: "")
 
 // GATK Filter
 include { VariantFiltrationSnpIndel as GATK_VariantFiltration } from './NextflowModules/GATK/4.3.0.0/VariantFiltration.nf' params(
