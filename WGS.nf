@@ -22,7 +22,7 @@ include { CombineGVCFs as GATK_CombineGVCFs } from './NextflowModules/GATK/4.3.0
 
 // GATK Filter
 include { VariantFiltrationSnpIndel as GATK_VariantFiltration } from './NextflowModules/GATK/4.3.0.0/VariantFiltration.nf' params(
-    gatk_path: "$params.gatk_path", genome: "$params.genome", snp_filter: "$params.gatk_snp_filter", snp_cluster: "$params.gatk_snp_cluster", indel_filter: "$params.gatk_indel_filter"
+    gatk_path: "$params.gatk_path", genome_fasta: "$params.genome", snp_filter: "$params.gatk_snp_filter", snp_cluster: "$params.gatk_snp_cluster", indel_filter: "$params.gatk_indel_filter"
 )
 
 // Fingerprint modules -> no gatk 4 option
