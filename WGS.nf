@@ -15,10 +15,10 @@ include { Merge as Sambamba_Merge } from './NextflowModules/Sambamba/0.7.0/Merge
 
 // GATK HaplotypeCaller
 include { IntervalListTools as PICARD_IntervalListTools } from './NextflowModules/Picard/3.0.0/IntervalListTools.nf' params(scatter_count:'500', optional:'--BREAK_BANDS_AT_MULTIPLES_OF 1000000')
-include { HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF } from './NextflowModules/GATK/4.3.0.0/HaplotypeCaller.nf' params(genome_fasta: "$params.genome", optional: "$params.gatk_hc_options")
+include { HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF } from './NextflowModules/GATK/4.3.0.0/HaplotypeCaller.nf' params(genome_fasta: "$params.genome", emit_ref_confidence: "GVCF", optional: "$params.gatk_hc_options")
+include { CombineGVCFsInterval as GATK_CombineGVCFsInterval } from './NextflowModules/GATK/4.3.0.0/CombineGVCFs.nf' params(genome_fasta: "$params.genome", optional: "")
 include { GenotypeGVCFsInterval as GATK_GenotypeGVCFs } from './NextflowModules/GATK/4.3.0.0/GenotypeGVCFs.nf' params(genome_fasta: "$params.genome", optional: "$params.gatk_ggvcf_options")
 include { MergeVcfs as PICARD_MergeVcfs } from './NextflowModules/Picard/3.0.0/MergeVcfs.nf'
-include { CombineGVCFsInterval as GATK_CombineGVCFsInterval } from './NextflowModules/GATK/4.3.0.0/CombineGVCFs.nf' params(genome_fasta: "$params.genome", optional: "")
 include { CombineGVCFs as GATK_CombineGVCFs } from './NextflowModules/GATK/4.3.0.0/CombineGVCFs.nf' params(genome_fasta: "$params.genome", optional: "")
 
 // GATK Filter
@@ -63,6 +63,7 @@ workflow {
     // GATK HaplotypeCaller (GVCF)
     PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
     GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
+
     // Create multisample vcf
     GATK_CombineGVCFsInterval(GATK_HaplotypeCallerGVCF.out.map{
         sample_id, gvcf_file, gvcf_idx_file, interval_file ->
@@ -71,10 +72,9 @@ workflow {
     }.groupTuple(by: 4).map{
         sample_id, gvcf_files, gvcf_idx_files, interval_file, interval -> [analysis_id, gvcf_files, gvcf_idx_files, interval_file[0]]
     })
-
     GATK_GenotypeGVCFs(GATK_CombineGVCFsInterval.out)
-
     PICARD_MergeVcfs(GATK_GenotypeGVCFs.out.groupTuple())
+
     // Create singlessample g.vcf
     GATK_CombineGVCFs(GATK_HaplotypeCallerGVCF.out.map{sample_id, gvcf_file, gvcf_idx_file, interval_file -> [sample_id, gvcf_file, gvcf_idx_file]}.groupTuple())
 
