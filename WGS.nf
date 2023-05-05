@@ -96,7 +96,7 @@ workflow {
         FastQC.out,
         Sambamba_MarkdupMerge.out.stats_file,
         PICARD_CollectMultipleMetrics.out,
-        Mosdepth.out.txt_files
+        Mosdepth_SubSample.out.txt_files.map{sample_id, txt_files -> txt_files}
     ).collect())
 
     // Create log files: Repository versions and Workflow params
