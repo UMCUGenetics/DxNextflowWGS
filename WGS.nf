@@ -56,13 +56,13 @@ workflow {
     )
 
     // GATK BaseRecalibrator
-    GATK_BaseRecalibratorApplyBQSR(Sambamba_MarkdupMerge.out.bam_file.combine(chromosomes))
-    Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out.bam_file)
-    Sambamba_Merge(GATK_BaseRecalibratorApplyBQSR.out.bam_file.mix(Sambamba_ViewUnmapped.out).groupTuple())
+    // GATK_BaseRecalibratorApplyBQSR(Sambamba_MarkdupMerge.out.bam_file.combine(chromosomes))
+    // Sambamba_ViewUnmapped(Sambamba_MarkdupMerge.out.bam_file)
+    // Sambamba_Merge(GATK_BaseRecalibratorApplyBQSR.out.bam_file.mix(Sambamba_ViewUnmapped.out).groupTuple())
 
     // GATK HaplotypeCaller (GVCF)
     PICARD_IntervalListTools(Channel.fromPath(params.gatk_hc_interval_list))
-    GATK_HaplotypeCallerGVCF(Sambamba_Merge.out.combine(PICARD_IntervalListTools.out.flatten()))
+    GATK_HaplotypeCallerGVCF(Sambamba_MarkdupMerge.out.bam_file.combine(PICARD_IntervalListTools.out.flatten()))
 
     // Create multisample vcf
     GATK_CombineGVCFsInterval(GATK_HaplotypeCallerGVCF.out.map{
@@ -82,15 +82,15 @@ workflow {
     GATK_VariantFiltration(PICARD_MergeVcfs.out)
 
     // GATK UnifiedGenotyper (fingerprint)
-    GATK_UnifiedGenotyper_Fingerprint(Sambamba_Merge.out)
+    GATK_UnifiedGenotyper_Fingerprint(Sambamba_MarkdupMerge.out.bam_file)
 
     // ExonCov
     // ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
 
     // QC
     FastQC(fastq_files)
-    PICARD_CollectMultipleMetrics(Sambamba_Merge.out)
-    Mosdepth(Sambamba_Merge.out)
+    PICARD_CollectMultipleMetrics(Sambamba_MarkdupMerge.out.bam_file)
+    Mosdepth(Sambamba_MarkdupMerge.out.bam_file)
 
     MultiQC(analysis_id, Channel.empty().mix(
         FastQC.out,
