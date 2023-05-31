@@ -1,4 +1,5 @@
-# DxNextflowWGS
+# DxNextflowWGS [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4709755.svg)](https://doi.org/10.5281/zenodo.4709755)
+
 Genome Diagnostics Nextflow WGS workflow
 
 ## Get Nextflow Modules
