@@ -28,8 +28,6 @@ sbatch <<EOT
 #SBATCH --export=NONE
 #SBATCH --account=diaggen
 
-module load Java/1.8.0_60
-
 /hpc/diaggen/software/tools/nextflow run $workflow_path/WGS.nf \
 -c $workflow_path/WGS.config \
 --fastq_path $input \
@@ -55,11 +53,18 @@ if [ \$? -eq 0 ]; then
     rm workflow.running
     touch workflow.done
 
+    echo "Change permissions"
+    chmod 775 -R $output
+    
     exit 0
 else
     echo "Nextflow failed"
     rm workflow.running
     touch workflow.failed
+    
+    echo "Change permissions"
+    chmod 775 -R $output
+    
     exit 1
 fi
 EOT
