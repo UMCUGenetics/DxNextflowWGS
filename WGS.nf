@@ -1,46 +1,45 @@
 #!/usr/bin/env nextflow
-nextflow.preview.dsl=2
 
 // Utils modules
-include extractFastqPairFromDir from './NextflowModules/Utils/fastq.nf'
-include ExportParams as Workflow_ExportParams from './NextflowModules/Utils/workflow.nf'
+include { extractFastqPairFromDir } from './NextflowModules/Utils/fastq.nf'
+include { ExportParams as Workflow_ExportParams } from './NextflowModules/Utils/workflow.nf'
 
 // Mapping modules
-include BWAMapping from './NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(genome_fasta: "$params.genome", optional: '-c 100 -M')
-include MarkdupMerge as Sambamba_MarkdupMerge from './NextflowModules/Sambamba/0.7.0/Markdup.nf'
+include { BWAMapping } from './NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(genome_fasta: "$params.genome", optional: '-c 100 -M')
+include { MarkdupMerge as Sambamba_MarkdupMerge } from './NextflowModules/Sambamba/0.7.0/Markdup.nf'
 
 // GATK BaseRecalibrator
-include BaseRecalibrator as GATK_BaseRecalibrator from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/BaseRecalibrator.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional_bqsr: "$params.gatk_bqsr_options", optional_pr: "$params.gatk_bqsr_pr_options")
-include ViewUnmapped as Sambamba_ViewUnmapped from './NextflowModules/Sambamba/0.7.0/ViewUnmapped.nf'
-include Merge as Sambamba_Merge from './NextflowModules/Sambamba/0.7.0/Merge.nf'
+include { BaseRecalibrator as GATK_BaseRecalibrator } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/BaseRecalibrator.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional_bqsr: "$params.gatk_bqsr_options", optional_pr: "$params.gatk_bqsr_pr_options")
+include { ViewUnmapped as Sambamba_ViewUnmapped } from './NextflowModules/Sambamba/0.7.0/ViewUnmapped.nf'
+include { Merge as Sambamba_Merge } from './NextflowModules/Sambamba/0.7.0/Merge.nf'
 
 // GATK HaplotypeCaller
-include IntervalListTools as PICARD_IntervalListTools from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'500', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
-include HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_hc_options")
-include CatVariantsGVCF as GATK_CatVariantsGVCF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "")
-include GenotypeGVCFs as GATK_GenotypeGVCFs from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_ggvcf_options")
-include CombineVariants as GATK_CombineVariants from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CombineVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--assumeIdenticalSamples")
-include VariantFiltrationSnpIndel as GATK_VariantFiltration from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/VariantFiltration.nf' params(
+include { IntervalListTools as PICARD_IntervalListTools } from './NextflowModules/Picard/2.22.0/IntervalListTools.nf' params(scatter_count:'500', optional: 'BREAK_BANDS_AT_MULTIPLES_OF=1000000')
+include { HaplotypeCallerGVCF as GATK_HaplotypeCallerGVCF } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/HaplotypeCaller.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_hc_options")
+include { CatVariantsGVCF as GATK_CatVariantsGVCF } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CatVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "")
+include { GenotypeGVCFs as GATK_GenotypeGVCFs } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/GenotypeGVCFs.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "$params.gatk_ggvcf_options")
+include { CombineVariants as GATK_CombineVariants } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/CombineVariants.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--assumeIdenticalSamples")
+include { VariantFiltrationSnpIndel as GATK_VariantFiltration } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/VariantFiltration.nf' params(
     gatk_path: "$params.gatk_path", genome: "$params.genome", snp_filter: "$params.gatk_snp_filter", snp_cluster: "$params.gatk_snp_cluster", indel_filter: "$params.gatk_indel_filter"
 )
 
 // Fingerprint modules
-include UnifiedGenotyper as GATK_UnifiedGenotyper_Fingerprint from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
+include { UnifiedGenotyper as GATK_UnifiedGenotyper_Fingerprint } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--intervals $params.dxtracks_path/$params.fingerprint_target --output_mode EMIT_ALL_SITES")
 
 // CNV modules
-include Freec from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(chr_len_file: "$params.freec_chr_len_file", chr_files: "$params.freec_chr_files", gem_mappability_file: "$params.freec_gem_mappability_file", ploidy: "$params.freec_ploidy", window: "$params.freec_window", telocentromeric: "$params.freec_telocentromeric")
-include AssessSignificance as Freec_AssessSignificance from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf'
-include MakeGraph as Freec_MakeGraph from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
+include { Freec } from './NextflowModules/ControlFREEC/11.5/Freec.nf' params(chr_len_file: "$params.freec_chr_len_file", chr_files: "$params.freec_chr_files", gem_mappability_file: "$params.freec_gem_mappability_file", ploidy: "$params.freec_ploidy", window: "$params.freec_window", telocentromeric: "$params.freec_telocentromeric")
+include { AssessSignificance as Freec_AssessSignificance } from './NextflowModules/ControlFREEC/11.5/AssessSignificance.nf'
+include { MakeGraph as Freec_MakeGraph } from './NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy:2)
 
 // BAF modules
-include UnifiedGenotyper as GATK_UnifiedGenotyper_BAF from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--intervals $params.baf_snsp_bed --output_mode EMIT_ALL_SITES")
+include { UnifiedGenotyper as GATK_UnifiedGenotyper_BAF } from './NextflowModules/GATK/3.8-1-0-gf15c1c3ef/UnifiedGenotyper.nf' params(gatk_path: "$params.gatk_path", genome: "$params.genome", optional: "--intervals $params.baf_snsp_bed --output_mode EMIT_ALL_SITES")
 
 // QC Modules
-include FastQC from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional: "")
-include CollectMultipleMetrics as PICARD_CollectMultipleMetrics from './NextflowModules/Picard/2.22.0/CollectMultipleMetrics.nf' params(genome:"$params.genome", optional: "PROGRAM=null PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics PROGRAM=CollectGcBiasMetrics METRIC_ACCUMULATION_LEVEL=null METRIC_ACCUMULATION_LEVEL=SAMPLE")
-include EstimateLibraryComplexity as PICARD_EstimateLibraryComplexity from './NextflowModules/Picard/2.22.0/EstimateLibraryComplexity.nf' params(optional:"OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500")
-include CollectWgsMetrics as PICARD_CollectWgsMetrics from './NextflowModules/Picard/2.22.0/CollectWgsMetrics.nf' params(genome:"$params.genome", optional: "MINIMUM_MAPPING_QUALITY=20 MINIMUM_BASE_QUALITY=10 COVERAGE_CAP=250")
-include MultiQC from './NextflowModules/MultiQC/1.9/MultiQC.nf' params(optional: "--config $baseDir/assets/multiqc_config.yaml")
+include { FastQC } from './NextflowModules/FastQC/0.11.8/FastQC.nf' params(optional: "")
+include { CollectMultipleMetrics as PICARD_CollectMultipleMetrics } from './NextflowModules/Picard/2.22.0/CollectMultipleMetrics.nf' params(genome:"$params.genome", optional: "PROGRAM=null PROGRAM=CollectAlignmentSummaryMetrics PROGRAM=CollectInsertSizeMetrics PROGRAM=CollectGcBiasMetrics METRIC_ACCUMULATION_LEVEL=null METRIC_ACCUMULATION_LEVEL=SAMPLE")
+include { EstimateLibraryComplexity as PICARD_EstimateLibraryComplexity } from './NextflowModules/Picard/2.22.0/EstimateLibraryComplexity.nf' params(optional:"OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500")
+include { CollectWgsMetrics as PICARD_CollectWgsMetrics } from './NextflowModules/Picard/2.22.0/CollectWgsMetrics.nf' params(genome:"$params.genome", optional: "MINIMUM_MAPPING_QUALITY=20 MINIMUM_BASE_QUALITY=10 COVERAGE_CAP=250")
+include { MultiQC } from './NextflowModules/MultiQC/1.9/MultiQC.nf' params(optional: "--config $baseDir/assets/multiqc_config.yaml")
 
 def fastq_files = extractFastqPairFromDir(params.fastq_path)
 def analysis_id = params.outdir.split('/')[-1]
@@ -145,7 +144,7 @@ process ExonCov {
     shell = ['/bin/bash', '-eo', 'pipefail']
 
     input:
-        tuple(analysis_id, sample_id, path(bam_file), path(bai_file))
+        tuple(val(analysis_id), val(sample_id), path(bam_file), path(bai_file))
 
     script:
         """
@@ -162,12 +161,12 @@ process QDNAseq {
     shell = ['/bin/bash', '-euo', 'pipefail']
 
     input:
-        tuple(sample_id, path(bam_file), path(bai_file))
+        tuple(val(sample_id), path(bam_file), path(bai_file))
 
     output:
-        tuple(sample_id, path("${sample_id}.vcf"), emit: vcf)
-        tuple(sample_id, path("${sample_id}.*.igv"), emit: igv)
-        tuple(sample_id, path("${sample_id}.readCountsFiltered.rds"), emit: rds)
+        tuple(val(sample_id), path("${sample_id}.vcf"), emit: vcf)
+        tuple(val(sample_id), path("${sample_id}.*.igv"), emit: igv)
+        tuple(val(sample_id), path("${sample_id}.readCountsFiltered.rds"), emit: rds)
 
     script:
         """
@@ -187,10 +186,10 @@ process BAF {
     shell = ['/bin/bash', '-euo', 'pipefail']
 
     input:
-        tuple(sample_id, path(vcf_file))
+        tuple(val(sample_id), path(vcf_file))
 
     output:
-        tuple(sample_id, path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
+        tuple(val(sample_id), path("${sample_id}_BAF.txt"), path("${sample_id}_BAF.pdf"))
 
     script:
         """
