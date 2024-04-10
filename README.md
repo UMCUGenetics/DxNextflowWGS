@@ -2,15 +2,9 @@
 
 Genome Diagnostics Nextflow WGS workflow
 
-## Get Nextflow Modules
+## Get Nextflow Modules and install OpenJDK and Nextflow
 ```bash
-git submodule update --init --recursive
-```
-
-## Install Nextflow
-```bash
-mkdir tools && cd tools
-curl -s https://get.nextflow.io | bash
+sh install.sh
 ```
 
 ## Running WGS workflow
