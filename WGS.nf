@@ -150,7 +150,11 @@ process ExonCov {
     script:
         """
         source ${params.exoncov_path}/venv/bin/activate
-        python ${params.exoncov_path}/ExonCov.py import_bam --threads ${task.cpus} --overwrite --exon_bed ${params.dxtracks_path}/${params.exoncov_bed} ${analysis_id} WGS ${bam_file}
+        flask --app ${params.exoncov_path}/ExonCov import_bam \
+        --threads ${task.cpus} \
+        --overwrite \
+        --exon_bed ${params.dxtracks_path}/${params.exoncov_bed} \
+        ${analysis_id} WGS ${bam_file}
         """
 }
 
